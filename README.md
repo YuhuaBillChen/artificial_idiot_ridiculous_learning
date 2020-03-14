@@ -1,2 +1,9 @@
-# artificial_idiot_ridiculous_learning
+# Artificial Idiot for Ridiculous Learning
 AI of RL: something dumb, something plaid,  something artificial. 
+
+## Mountaincar
+
+DQN sample application, key points:
+- Experience replay
+- Async *target* network
+- Epsilon greedy policy
