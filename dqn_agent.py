@@ -75,27 +75,10 @@ class DQNAgent(object):
         dones = np.squeeze(dones)
 
         targets = self.train_model.predict(states)
-        q_futures = self.target_model.predict(new_states)
-
-        # cp_targets = np.array(targets, copy=True)
-        # for i, sample in enumerate(samples):
-        #     state, action, reward, new_state, done = sample
-        #     target = targets[i]
-        #     if done:
-        #         target[action] = reward
-        #     else:
-        #         Q_future = max(q_futures[i])
-        #         target[action] = reward + Q_future * self.gamma            
-
+        q_futures = self.target_model.predict(new_states)       
 
         targets[(range(self.BATCH_SIZE), actions[:].astype(int))] = rewards + \
             (self.gamma*q_futures.max(axis=1))*np.logical_not(dones)
-
-        # if not np.allclose(targets, cp_targets):
-        #     print("Two targets are not the same")
-        #     import pdb
-        #     pdb.set_trace()
-
 
         self.train_model.fit(states, targets, epochs=1, verbose=0)
 
@@ -167,8 +150,6 @@ def train():
             if done:
                 break
 
-        # dqn_agent.update_target()
-
         if step < len_episode - 1:
             print("Completed in %d episdoe, in %d steps, reward: %d." % (i_episode, step, reward))
         else:
@@ -212,5 +193,5 @@ def test():
 
 
 if __name__ == "__main__":
-    # train()
+    train()
     test()
