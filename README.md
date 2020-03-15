@@ -7,3 +7,7 @@ DQN sample application, key points:
 - Experience replay
 - Async *target* network
 - Epsilon greedy policy
+
+Double DQN:
+- Use different value estimators in selecting and evaluating
+
