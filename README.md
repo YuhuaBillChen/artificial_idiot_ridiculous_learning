@@ -11,3 +11,8 @@ DQN sample application, key points:
 Double DQN:
 - Use different value estimators in selecting and evaluating
 
+Duel DQN/DDQN:
+- Decoupled Value and Advantage function estimator
+
+
+
