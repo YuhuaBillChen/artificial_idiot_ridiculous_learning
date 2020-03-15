@@ -4,19 +4,11 @@ import gym
 import matplotlib.pyplot as plt
 import random
 from collections import deque
-from tensorflow.keras import Sequential
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, Concatenate, Input
 import os
 import glob
-
-from keras.backend.tensorflow_backend import set_session
-
-SAVE_PER_EPISODE = 250
-RENDER_PER_EPISODE = 50
-NB_EPISDOE = 500
-LEN_EPISODE = 200
-FN_PREFIX = "DDQN"
 
 def set_up_session():
     config = tf.ConfigProto()
@@ -26,7 +18,13 @@ def set_up_session():
     sess = tf.Session(config=config)
     set_session(sess)  # set this TensorFlow session as the default session for Kera
 
-class DDQNAgent(object):
+SAVE_PER_EPISODE = 250
+RENDER_PER_EPISODE = 50
+NB_EPISDOE = 500
+LEN_EPISODE = 200
+FN_PREFIX = "DuelDDQN"
+
+class DuelDDQNAgent(object):
     """
         DQN Agent
     """
@@ -57,12 +55,17 @@ class DDQNAgent(object):
         self.target_model = self.nn_Q_model()
 
     def nn_Q_model(self):
-        model = Sequential()
+        # Duel Network
+        # Changed network structure
+        
         state_shape = self.env.observation_space.shape
-
-        model.add(Dense(24, input_dim=state_shape[0], activation="relu"))
-        model.add(Dense(48, activation="relu"))
-        model.add(Dense(self.env.action_space.n, activation='linear'))
+        input_layer = Input(shape=state_shape)
+        hidden_layer1 = Dense(24, input_dim=state_shape[0], activation="relu")(input_layer)
+        value_layer = Dense(24, activation="relu")(hidden_layer1)
+        advatage_layer = Dense(24, activation="relu")(hidden_layer1)
+        merged_layer = Concatenate(axis=-1)([value_layer, advatage_layer])
+        results = Dense(self.env.action_space.n, activation='linear')(merged_layer)
+        model = Model(inputs=input_layer, outputs=results)
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model  # Q_value
 
@@ -89,11 +92,6 @@ class DDQNAgent(object):
         q_futures = self.target_model.predict(new_states)       
 
         action_futures = self.train_model.predict(new_states)
-
-        # DQN target
-        # Y_k = r + gamma max Q(s', a'; theta_k^-) (4.3)
-        # targets[(range(self.BATCH_SIZE), actions[:].astype(int))] = rewards + \
-        #     (self.gamma*q_futures.max(axis=1))*np.logical_not(dones)
 
         # DDQN target
         # Y_k = r + gamma Q(s', argmax Q(s', a; thetha_k); theta_k^-) (4.3)
@@ -141,9 +139,9 @@ def train():
     nb_episode = NB_EPISDOE
     len_episode = LEN_EPISODE
 
-    dqn_agent = DQNAgent(env=env)
+    dqn_agent = DuelDDQNAgent(env=env)
 
-    chkpts = sorted(glob.glob("episode-*.model"), key=os.path.basename, reverse=True)
+    chkpts = sorted(glob.glob("%s-episode-*.model"%FN_PREFIX), key=os.path.basename, reverse=True)
     if len(chkpts) > 0:
         dqn_agent.load_model(chkpts[0])
 
@@ -187,7 +185,7 @@ def test():
     nb_episode = 10
     len_episode = 200
 
-    dqn_agent = DDQNAgent(env=env)
+    dqn_agent = DuelDDQNAgent(env=env)
     chkpts = sorted(glob.glob("%s-episode-*.model"%FN_PREFIX), key=os.path.basename, reverse=True)
     dqn_agent.load_model(chkpts[0])
     print("loaded checkpoint:%s" % chkpts[0])
@@ -211,6 +209,5 @@ def test():
 
 
 if __name__ == "__main__":
-    set_up_session()
     train()
     test()
