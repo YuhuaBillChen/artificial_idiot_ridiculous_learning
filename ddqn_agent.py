@@ -10,6 +10,14 @@ from tensorflow.keras.layers import Dense
 import os
 import glob
 
+from keras.backend.tensorflow_backend import set_session
+
+SAVE_PER_EPISODE = 250
+RENDER_PER_EPISODE = 50
+NB_EPISDOE = 500
+LEN_EPISODE = 200
+FN_PREFIX = "DDQN"
+
 def set_up_session():
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
@@ -18,13 +26,7 @@ def set_up_session():
     sess = tf.Session(config=config)
     set_session(sess)  # set this TensorFlow session as the default session for Kera
 
-SAVE_PER_EPISODE = 250
-RENDER_PER_EPISODE = 50
-NB_EPISDOE = 500
-LEN_EPISODE = 200
-FN_PREFIX = "DQN"
-
-class DQNAgent(object):
+class DDQNAgent(object):
     """
         DQN Agent
     """
@@ -84,10 +86,18 @@ class DQNAgent(object):
         dones = np.squeeze(dones)
 
         targets = self.train_model.predict(states)
+        action_futures = self.train_model.predict(new_states)
         q_futures = self.target_model.predict(new_states)       
 
-        targets[(range(self.BATCH_SIZE), actions[:].astype(int))] = rewards + \
-            (self.gamma*q_futures.max(axis=1))*np.logical_not(dones)
+        # DQN target
+        # Y_k = r + gamma max Q(s', a'; theta_k^-) (4.3)
+        # targets[(range(self.BATCH_SIZE), actions[:].astype(int))] = rewards + \
+        #     (self.gamma*q_futures.max(axis=1))*np.logical_not(dones)
+
+        # DDQN target
+        # Y_k = r + gamma Q(s', argmax Q(s', a; thetha_k); theta_k^-) (4.3)
+        targets[range(self.BATCH_SIZE), actions[:].astype(int)] = rewards + \
+            (self.gamma*q_futures[range(self.BATCH_SIZE), np.argmax(action_futures, -1)])*np.logical_not(dones)
 
         self.train_model.fit(states, targets, epochs=1, verbose=0)
 
@@ -132,7 +142,7 @@ def train():
 
     dqn_agent = DQNAgent(env=env)
 
-    chkpts = sorted(glob.glob("%s-episode-*.model"%FN_PREFIX), key=os.path.basename, reverse=True)
+    chkpts = sorted(glob.glob("episode-*.model"), key=os.path.basename, reverse=True)
     if len(chkpts) > 0:
         dqn_agent.load_model(chkpts[0])
 
@@ -144,7 +154,7 @@ def train():
         for step in range(len_episode):
             action = dqn_agent.egreedy_action(cur_state)
             if i_episode % RENDER_PER_EPISODE == 0:
-            	env.render()
+                env.render()
             new_state, reward, done, _ = env.step(action)
 
             new_state = new_state.reshape(1, 2)
@@ -176,7 +186,7 @@ def test():
     nb_episode = 10
     len_episode = 200
 
-    dqn_agent = DQNAgent(env=env)
+    dqn_agent = DDQNAgent(env=env)
     chkpts = sorted(glob.glob("%s-episode-*.model"%FN_PREFIX), key=os.path.basename, reverse=True)
     dqn_agent.load_model(chkpts[0])
     print("loaded checkpoint:%s" % chkpts[0])
@@ -200,5 +210,6 @@ def test():
 
 
 if __name__ == "__main__":
+    set_up_session()
     train()
     test()
