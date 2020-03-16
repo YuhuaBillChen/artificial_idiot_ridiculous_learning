@@ -141,7 +141,7 @@ def train():
     nb_episode = NB_EPISDOE
     len_episode = LEN_EPISODE
 
-    dqn_agent = DQNAgent(env=env)
+    dqn_agent = DDQNAgent(env=env)
 
     chkpts = sorted(glob.glob("episode-*.model"), key=os.path.basename, reverse=True)
     if len(chkpts) > 0:
