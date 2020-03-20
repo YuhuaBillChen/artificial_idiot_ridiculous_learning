@@ -39,7 +39,7 @@ class DuelDDQNAgent(object):
             gamma=0.99,
             learning_rate=1e-3,
             epsilon_init=1.0,
-            epsilon_min=0.01,
+            epsilon_min=0.001,
             epsilon_decay=0.9995
     ):
         self.env = env
@@ -169,7 +169,7 @@ def train():
                 break
 
         if step < len_episode - 1:
-            print("Completed in %d episdoe, in %d steps, reward: %d." % (i_episode, step, reward))
+            print("Completed in %d episode, in %d steps, reward: %d." % (i_episode, step, reward))
         else:
             print("Failed in %d episode, max_distance: %.4f, epsilon: %.4f."%(i_episode, max_distance, dqn_agent.epsilon))
 
@@ -200,7 +200,7 @@ def test():
             if done:
                 break
         if step < len_episode - 1:
-            print("Completed in {} steps in {} episdoe, reward: {}.".format(step, i_episode, reward))
+            print("Completed in {} steps in {} episode, reward: {}.".format(step, i_episode, reward))
         else:
             print("Failed in {} episode, reward：{}.".format(i_episode, reward))
             pass
