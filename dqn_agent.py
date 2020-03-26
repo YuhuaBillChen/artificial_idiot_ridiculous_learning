@@ -1,28 +1,29 @@
 import tensorflow as tf
 import numpy as np
 import gym
-import matplotlib.pyplot as plt
 import random
 from collections import deque
 from tensorflow.keras import Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Dense
+from tensorflow.keras.backend import set_session
 import os
 import glob
-
-def set_up_session():
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-    config.log_device_placement = True  # to log device placement (on which device the operation ran)
-                                        # (nothing gets printed in Jupyter, only if you run it standalone)
-    sess = tf.Session(config=config)
-    set_session(sess)  # set this TensorFlow session as the default session for Kera
 
 SAVE_PER_EPISODE = 250
 RENDER_PER_EPISODE = 50
 NB_EPISDOE = 500
 LEN_EPISODE = 200
 FN_PREFIX = "DQN"
+
+
+def set_up_session():
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    config.log_device_placement = False
+    sess = tf.Session(config=config)
+    set_session(sess)  # set this TensorFlow session as the default session for Kera
+
 
 class DQNAgent(object):
     """
@@ -200,5 +201,6 @@ def test():
 
 
 if __name__ == "__main__":
+    set_up_session()
     train()
     test()

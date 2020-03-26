@@ -15,5 +15,12 @@ Dueling network DQN/DDQN:
 - Decoupled Value and Advantage function estimator
 - Video: https://youtu.be/6fB8kJ-v-7c
 
+## Cartpole
+
+Policy Gradients, REINFORCE algorithm
+- Discounted rewards
+- Customized model update
+
+
 
 

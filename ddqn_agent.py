@@ -9,7 +9,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Dense
 import os
 import glob
-
 from keras.backend.tensorflow_backend import set_session
 
 SAVE_PER_EPISODE = 250
@@ -17,14 +16,16 @@ RENDER_PER_EPISODE = 50
 NB_EPISDOE = 500
 LEN_EPISODE = 200
 FN_PREFIX = "DDQN"
+GYM_ENVIRON = 'MountainCar-v0'
+
 
 def set_up_session():
     config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-    config.log_device_placement = False  # to log device placement (on which device the operation ran)
-                                        # (nothing gets printed in Jupyter, only if you run it standalone)
+    config.gpu_options.allow_growth = True
+    config.log_device_placement = False
     sess = tf.Session(config=config)
-    set_session(sess)  # set this TensorFlow session as the default session for Kera
+    set_session(sess)
+
 
 class DDQNAgent(object):
     """
@@ -136,7 +137,7 @@ class DDQNAgent(object):
 
 
 def train():
-    env = gym.make('MountainCar-v0')
+    env = gym.make(GYM_ENVIRON)
 
     nb_episode = NB_EPISDOE
     len_episode = LEN_EPISODE
@@ -151,14 +152,14 @@ def train():
 
     for i_episode in range(nb_episode):
         max_distance = -1.5 # minimum -1.2
-        cur_state = env.reset().reshape(1, 2)
+        cur_state = env.reset().reshape(1, -1)
         for step in range(len_episode):
             action = dqn_agent.egreedy_action(cur_state)
             if i_episode % RENDER_PER_EPISODE == 0:
                 env.render()
             new_state, reward, done, _ = env.step(action)
 
-            new_state = new_state.reshape(1, 2)
+            new_state = new_state.reshape(1, -1)
 
             reward = 1.0 if new_state[0][0] >= 0.5 else -1.0
 
@@ -183,7 +184,7 @@ def train():
 
 
 def test():
-    env = gym.make('MountainCar-v0')
+    env = gym.make(GYM_ENVIRON)
     nb_episode = 10
     len_episode = 200
 
@@ -193,12 +194,12 @@ def test():
     print("loaded checkpoint:%s" % chkpts[0])
 
     for i_episode in range(nb_episode):
-        cur_state = env.reset().reshape(1, 2)
+        cur_state = env.reset().reshape(1, -1)
         for step in range(len_episode):
             action = dqn_agent.take_action(cur_state)
             env.render()
             new_state, reward, done, _ = env.step(action)
-            cur_state = new_state.reshape(-1, 2)
+            cur_state = new_state.reshape(1, -1)
             if done:
                 break
         if step < len_episode - 1:
