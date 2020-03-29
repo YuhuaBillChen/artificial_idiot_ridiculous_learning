@@ -145,7 +145,7 @@ def train():
         for step in range(len_episode):
             action = dqn_agent.egreedy_action(cur_state)
             if i_episode % RENDER_PER_EPISODE == 0:
-            	env.render()
+                env.render()
             new_state, reward, done, _ = env.step(action)
 
             new_state = new_state.reshape(1, 2)

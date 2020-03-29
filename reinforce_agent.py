@@ -5,7 +5,6 @@ Policy gradient, REINFORCE algorithm
 import tensorflow as tf
 import numpy as np
 import gym
-import random
 from collections import deque
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense
@@ -23,7 +22,6 @@ GYM_ENVIRON = "CartPole-v0"
 
 
 def set_up_session():
-    os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     config.log_device_placement = False
@@ -131,8 +129,8 @@ class ReinforceAgent(object):
         """
         state_shape = self.env.observation_space.shape
         input_layer = Input(shape=state_shape)
-        hidden_layer1 = Dense(24, input_dim=state_shape[0], activation="relu")(input_layer)
-        hidden_layer2 = Dense(48, input_dim=state_shape[0], activation="relu")(hidden_layer1)
+        hidden_layer1 = Dense(24, activation="relu")(input_layer)
+        hidden_layer2 = Dense(48, activation="relu")(hidden_layer1)
         results = Dense(self.env.action_space.n, activation='softmax')(hidden_layer2)
         model = Model(inputs=input_layer, outputs=results)
         return model
@@ -232,6 +230,7 @@ def test():
             print("Failed in %d episode, steps: %d" % (i_episode, step))
 
     env.close()
+
 
 if __name__ == "__main__":
     set_up_session()
