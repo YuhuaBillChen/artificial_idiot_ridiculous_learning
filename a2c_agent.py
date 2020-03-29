@@ -18,7 +18,7 @@ import glob
 
 SAVE_PER_EPISODE = 250
 RENDER_PER_EPISODE = 100
-NB_EPISDOE = 500
+NB_EPISDOE = 1000
 LEN_EPISODE = 200
 TRAINING_SUCCESS_CNT = 5
 FN_PREFIX = "A2C-CP"
@@ -222,7 +222,6 @@ def train():
     for i_episode in range(nb_episode):
         max_distance = -1.5
         cur_state = env.reset().reshape(1, -1)
-        loss = np.array([0.0, 0.0])
 
         for step in range(len_episode):
             action, log_prob = agent.policy_action(cur_state)
@@ -235,10 +234,10 @@ def train():
             agent.preceive(cur_state, action, reward, new_state, done)
 
             crt_loss, act_loss = agent.update_actor_critic()
-            losses[1] = crt_loss
-            losses[3] = 0.999 * losses[3] + 0.001 * crt_loss
             losses[0] = act_loss
-            losses[2] = 0.999 * losses[2] + 0.001 * act_loss
+            losses[2] = 0.9 * losses[2] + 0.1 * act_loss
+            losses[1] = crt_loss
+            losses[3] = 0.9 * losses[3] + 0.1 * crt_loss
 
             max_distance = max(new_state[0][0], max_distance)
 
