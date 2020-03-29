@@ -282,7 +282,7 @@ def train():
         if step >= len_episode - 1:
             print("Completed in %d episode, in %d steps, reward: %d." % (i_episode, step, reward))
         else:
-            print("Failed in %d episode, steps: %d, avg_loss: %.4f, %.4f loss: %.4f, %.4f" % (
+            print("Failed in %d episode, steps: %d, loss: %.4f, %.4f avg_loss: %.4f, %.4f" % (
                 i_episode, step, losses[0], losses[1],  losses[2], losses[3]))
 
         if i_episode % SAVE_PER_EPISODE == 0:

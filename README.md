@@ -21,6 +21,10 @@ Policy Gradients, REINFORCE algorithm
 - Discounted rewards
 - Customized model update
 
+Actor-Critic, on-policy
+- Critic provide states-actor value
+- Actor takes action (policy)
+
 
 
 
