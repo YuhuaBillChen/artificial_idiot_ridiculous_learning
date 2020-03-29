@@ -14,6 +14,7 @@ SAVE_PER_EPISODE = 250
 RENDER_PER_EPISODE = 50
 NB_EPISDOE = 500
 LEN_EPISODE = 200
+TRAINING_SUCCESS_CNT = 5
 FN_PREFIX = "DuelDDQN"
 GYM_ENVIRON = 'MountainCar-v0'
 
@@ -143,6 +144,7 @@ def train():
     len_episode = LEN_EPISODE
 
     dqn_agent = DuelDDQNAgent(env=env)
+    success_count = 0
 
     chkpts = sorted(glob.glob("%s-episode-*.model"%FN_PREFIX), key=os.path.basename, reverse=True)
     if len(chkpts) > 0:
@@ -172,9 +174,14 @@ def train():
                 break
 
         if step < len_episode - 1:
+            success_count += 1
             print("Completed in %d episode, in %d steps, reward: %d." % (i_episode, step, reward))
         else:
+            success_count = 0
             print("Failed in %d episode, max_distance: %.4f, epsilon: %.4f."%(i_episode, max_distance, dqn_agent.epsilon))
+
+        if success_count > TRAINING_SUCCESS_CNT:
+            break
 
         if i_episode % SAVE_PER_EPISODE == 0:
             dqn_agent.save_model("{}-episode-{}.model".format(FN_PREFIX, i_episode))

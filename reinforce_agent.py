@@ -17,6 +17,7 @@ SAVE_PER_EPISODE = 500
 RENDER_PER_EPISODE = 100
 NB_EPISDOE = 1000
 LEN_EPISODE = 200
+TRAINING_SUCCESS_CNT = 5
 FN_PREFIX = "Reinforce"
 GYM_ENVIRON = "CartPole-v0"
 
@@ -167,6 +168,7 @@ def train():
 
     agent = ReinforceAgent(env=env)
     avg_loss = 0.0
+    success_count = 0
 
     for i_episode in range(nb_episode):
         max_distance = -1.5
@@ -193,10 +195,15 @@ def train():
             cur_state = new_state
 
         if step >= len_episode - 1:
+            success_count += 1
             print("Completed in %d episode, in %d steps, reward: %d." % (i_episode, step, reward))
         else:
+            success_count = 0
             print("Failed in %d episode, steps: %d, avg_loss: %f, loss: %f" % (
                 i_episode, step, avg_loss, loss))
+
+        if success_count > TRAINING_SUCCESS_CNT:
+            break
 
         if i_episode % SAVE_PER_EPISODE == 0:
             agent.save_model("{}-episode-{}.model".format(FN_PREFIX, i_episode))

@@ -18,12 +18,17 @@ Dueling network DQN/DDQN:
 ## Cartpole
 
 Policy Gradients, REINFORCE algorithm
+- On-policy MCMC
 - Discounted rewards
 - Customized model update
 
 Actor-Critic, on-policy
-- Critic provide states-actor value
-- Actor takes action (policy)
+- The Critic provide states-actor value
+- Simply replaces REINFORCE's reward with the Critic's value in the actor (policy)
+
+A2C
+- Critic estimates Advantage function instead of direct q-value 
+- TD updates
 
 
 
