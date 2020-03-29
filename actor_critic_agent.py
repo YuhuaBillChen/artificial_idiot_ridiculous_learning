@@ -16,9 +16,9 @@ from tensorflow.keras.utils import to_categorical
 import os
 import glob
 
-SAVE_PER_EPISODE = 500
+SAVE_PER_EPISODE = 200
 RENDER_PER_EPISODE = 100
-NB_EPISDOE = 1000
+NB_EPISDOE = 800
 LEN_EPISODE = 200
 FN_PREFIX = "ActorCritic"
 GYM_ENVIRON = 'CartPole-v0'
@@ -237,11 +237,9 @@ class ActorCriticAgent(object):
         self.critic_model.save(fn.replace('.model', '-critic.model'))
 
     def load_model(self, fn):
-        import os
-        if os.path.exists(fn):
-            from tensorflow.keras.models import load_model
-            self.actor_model = load_model(fn.replace('.model', '-actor.model'))
-            self.critic_model = load_model(fn.replace('.model', '-critic.model'))
+        from tensorflow.keras.models import load_model
+        self.actor_model = load_model(fn.replace('.model', '-actor.model'))
+        self.critic_model = load_model(fn.replace('.model', '-critic.model'))
 
 
 def train():
