@@ -313,12 +313,14 @@ def train():
 def test():
     env = gym.make(GYM_ENVIRON)
     nb_episode = 10
-    len_episode = 200
+    len_episode = LEN_EPISODE
 
     agent = DDPGAgent(env=env)
     chkpts = sorted(glob.glob("%s-episode-*.model" % FN_PREFIX), key=os.path.basename, reverse=True)
-    agent.load_model(chkpts[0].replace("-actor.model", ".model").replace("-critic.model", ".model"))
-    print("loaded checkpoint:%s" % chkpts[0])
+    mdl_file = chkpts[0].replace("-actor.model", ".model").replace("-critic.model", ".model")
+    print("loading checkpoint:%s" % mdl_file)
+
+    agent.load_model(mdl_file)
 
     for i_episode in range(nb_episode):
         cur_state = env.reset().reshape(1, -1)
@@ -330,9 +332,9 @@ def test():
             if done:
                 break
         if reward > WIN_REWARD:
-            print("Completed in %d episode, in %d steps, reward: %d." % (i_episode, step, reward))
+            print("Completed in %d episode, in %d steps, reward: %f." % (i_episode, step, reward))
         else:
-            print("Failed in %d episode, steps: %d" % (i_episode, step))
+            print("Failed in %d eps, rewards: %.2f, maxdist: %.2f" % (i_episode, reward, max_distance))
 
     env.close()
 
