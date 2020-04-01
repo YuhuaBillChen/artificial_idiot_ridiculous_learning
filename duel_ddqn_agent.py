@@ -19,15 +19,6 @@ FN_PREFIX = "DuelDDQN"
 GYM_ENVIRON = 'MountainCar-v0'
 
 
-def set_up_session():
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-    config.log_device_placement = False  # to log device placement (on which device the operation ran)
-                                        # (nothing gets printed in Jupyter, only if you run it standalone)
-    sess = tf.Session(config=config)
-    set_session(sess)  # set this TensorFlow session as the default session for Kera
-
-
 class DuelDDQNAgent(object):
     """
         DQN Agent
@@ -219,6 +210,6 @@ def test():
 
 
 if __name__ == "__main__":
-    set_up_session()
+    tf.compat.v1.disable_eager_execution()
     train()
     test()

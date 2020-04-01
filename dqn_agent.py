@@ -17,14 +17,6 @@ LEN_EPISODE = 200
 FN_PREFIX = "DQN"
 
 
-def set_up_session():
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    config.log_device_placement = False
-    sess = tf.Session(config=config)
-    set_session(sess)  # set this TensorFlow session as the default session for Kera
-
-
 class DQNAgent(object):
     """
         DQN Agent
@@ -201,6 +193,6 @@ def test():
 
 
 if __name__ == "__main__":
-    set_up_session()
+    tf.compat.v1.disable_eager_execution()
     train()
     test()
