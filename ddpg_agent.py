@@ -244,8 +244,6 @@ def evaluation(env, agent):
         max_distance = -1.5
         for step in range(LEN_EPISODE):
             action = agent.take_action(cur_state)
-            if agent.time_step > 10000:
-                print(action)
             new_state, reward, done, _ = env.step(action)
             env.render()
             new_state = new_state.reshape(1, -1)
