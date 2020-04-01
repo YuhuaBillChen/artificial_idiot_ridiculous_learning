@@ -30,6 +30,12 @@ A2C
 - Critic estimates Advantage function instead of direct q-value 
 - TD updates
 
+## MountainCar Continuous
+
+DDPG
+- Use the gradient from critic directly
+- Soft update of the target network
+
 
 
 

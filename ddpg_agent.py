@@ -334,7 +334,7 @@ def test():
         if reward > WIN_REWARD:
             print("Completed in %d episode, in %d steps, reward: %f." % (i_episode, step, reward))
         else:
-            print("Failed in %d eps, rewards: %.2f, maxdist: %.2f" % (i_episode, reward, max_distance))
+            print("Failed in %d eps, rewards: %.2f" % (i_episode, reward))
 
     env.close()
 
